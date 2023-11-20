@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_STATES 100
+#define MAX_ALPHABET 100
+
+int num_states, num_symbols;
+int transitions[MAX_STATES][MAX_ALPHABET][MAX_STATES];
+bool epsilon_closure[MAX_STATES][MAX_STATES];
+
+void epsilonClosure(int state, int current) {
+    epsilon_closure[state][current] = true;
+    for (int i = 0; i < num_states; i++) {
+        if (transitions[current][0][i] && !epsilon_closure[state][i]) {
+            epsilonClosure(state, i);
+        }
+    }
+}
+
+void computeEpsilonClosures() {
+    for (int i = 0; i < num_states; i++) {
+        for (int j = 0; j < num_states; j++) {
+            epsilon_closure[i][j] = false;
+        }
+        epsilonClosure(i, i);
+    }
+}
+
+int main() {
+    printf("Enter the number of states: ");
+    scanf("%d", &num_states);
+
+    printf("Enter the number of input symbols (excluding ε): ");
+    scanf("%d", &num_symbols);
+
+  
+    printf("Enter transitions (use -1 for no transition):\n");
+    for (int i = 0; i < num_states; i++) {
+        for (int j = 0; j < num_symbols + 1; j++) { 
+            for (int k = 0; k < num_states; k++) {
+                scanf("%d", &transitions[i][j][k]);
+            }
+        }
+    }
+
+    computeEpsilonClosures();
+
+    
+    printf("\nEpsilon-closures for each state:\n");
+    for (int i = 0; i < num_states; i++) {
+        printf("ε-closure(%d): ", i);
+        for (int j = 0; j < num_states; j++) {
+            if (epsilon_closure[i][j]) {
+                printf("%d ", j);
+            }
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
